@@ -1,0 +1,6 @@
+curl -X POST http://localhost:8000/agent/run \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_id": "bharath",
+    "input": "Explain EKS in one paragraph"
+  }'

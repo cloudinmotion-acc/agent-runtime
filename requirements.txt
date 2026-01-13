@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pydantic
+langgraph
+redis
+psycopg2-binary
+requests
+python-dotenv
