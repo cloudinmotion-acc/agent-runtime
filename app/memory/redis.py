@@ -1,14 +1,13 @@
+import json
 import redis
-from app.config import REDIS_HOST, REDIS_PORT
 
-client = redis.Redis(
-    host=REDIS_HOST,
-    port=REDIS_PORT,
-    decode_responses=True
-)
+class RedisMemory:
+    def __init__(self, url: str):
+        self.client = redis.Redis.from_url(url, decode_responses=True)
 
-def get_context(user_id: str) -> str:
-    return client.get(user_id) or ""
+    def get_state(self, session_id: str) -> dict:
+        data = self.client.get(session_id)
+        return json.loads(data) if data else {}
 
-def set_context(user_id: str, context: str):
-    client.set(user_id, context)
+    def save_state(self, session_id: str, state: dict):
+        self.client.set(session_id, json.dumps(state))

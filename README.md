@@ -39,11 +39,22 @@ uvicorn app.main:app --reload
 Test the server from the terminal
 
 ```sh
-curl -X POST http://localhost:8000/generate \
+curl -X POST http://localhost:8000/agent/run \
   -H "Content-Type: application/json" \
   -d '{
-    "prompt": "Explain Terraform like I am 15",
-    "model": "gpt-5-nano"
+    "session_id": "demo-1",
+    "input": "Who are you?",
+    "model": "gpt-4o"
   }'
+```
 
+Then:
+```sh
+curl -X POST http://localhost:8000/agent/run \
+  -H "Content-Type: application/json" \
+  -d '{
+    "session_id": "demo-1",
+    "input": "What did I just ask?",
+    "model": "gpt-4o"
+  }'
 ```
