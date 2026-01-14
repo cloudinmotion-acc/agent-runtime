@@ -1,13 +1,40 @@
 import json
 import redis
+import logging
+
+logger = logging.getLogger(__name__)
 
 class RedisMemory:
-    def __init__(self, url: str):
-        self.client = redis.Redis.from_url(url, decode_responses=True)
+    def __init__(self, host: str, port: int):
+        try:
+            if host.startswith("redis://"):
+                host = host.replace("redis://", "")
+            
+            self.client = redis.Redis(
+                host=host, 
+                port=port, 
+                decode_responses=True, 
+                socket_timeout=5, 
+                socket_connect_timeout=5
+            )
+            # Test connection
+            self.client.ping()
+            logger.info(f"Redis connected: {host}:{port}")
+        except Exception as e:
+            logger.error(f"Redis connection failed: {e}")
+            raise
 
     def get_state(self, session_id: str) -> dict:
-        data = self.client.get(session_id)
-        return json.loads(data) if data else {}
+        try:
+            data = self.client.get(session_id)
+            return json.loads(data) if data else {}
+        except Exception as e:
+            logger.error(f"Failed to get state for {session_id}: {e}")
+            return {}
 
     def save_state(self, session_id: str, state: dict):
-        self.client.set(session_id, json.dumps(state))
+        try:
+            self.client.set(session_id, json.dumps(state))
+        except Exception as e:
+            logger.error(f"Failed to save state for {session_id}: {e}")
+            raise
