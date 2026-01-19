@@ -33,7 +33,7 @@ Create a `.env` file and copy the contents from `.env.example` and replace with 
 Run the FastAPI application
 
 ```bash
-uvicorn app.main:app --reload
+uvicorn app.main:app --reload --port 9000
 ```
 
 ### Step-5
@@ -41,22 +41,22 @@ uvicorn app.main:app --reload
 Test the server from the terminal
 
 ```sh
-curl -X POST http://localhost:8000/agent/run \
+curl -X POST http://localhost:9000/agent/run \
   -H "Content-Type: application/json" \
   -d '{
     "session_id": "demo-1",
     "input": "Who are you?",
-    "model": "gpt-4o"
+    "model": "gpt-5-nano"
   }'
 ```
 
 Then:
 ```sh
-curl -X POST http://localhost:8000/agent/run \
+curl -X POST http://localhost:9000/agent/run \
   -H "Content-Type: application/json" \
   -d '{
     "session_id": "demo-1",
     "input": "What did I just ask?",
-    "model": "gpt-4o"
+    "model": "gpt-5-nano"
   }'
 ```
