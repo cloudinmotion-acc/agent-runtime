@@ -18,11 +18,12 @@ router = APIRouter()
 MODEL_ROUTER_URL = os.getenv("MODEL_ROUTER_URL", "http://localhost:8000")
 REDIS_HOST = str(os.getenv("REDIS_HOST"))
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", "")
 
 try:
     agent = SimpleChatAgent(
         router=ModelRouterClient(MODEL_ROUTER_URL),
-        memory=RedisMemory(REDIS_HOST, REDIS_PORT)
+        memory=RedisMemory(REDIS_HOST, REDIS_PORT, REDIS_PASSWORD)
     )
     logger.info("Agent initialized successfully")
 except Exception as e:

@@ -1,25 +1,30 @@
 import json
 import redis
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
 class RedisMemory:
-    def __init__(self, host: str, port: int):
+    def __init__(self, host: str, port: int, password: str):
         try:
-            if host.startswith("redis://"):
-                host = host.replace("redis://", "")
-            
+            # Normalize host
+            host = host.replace("redis://", "").replace("rediss://", "")
+
             self.client = redis.Redis(
-                host=host, 
-                port=port, 
-                decode_responses=True, 
-                socket_timeout=5, 
-                socket_connect_timeout=5
+                host=host,
+                port=port,
+                password=password,
+                decode_responses=True,
+                socket_timeout=5,
+                socket_connect_timeout=5,
+                ssl=True,
+                ssl_ca_certs="/etc/pki/tls/certs/ca-bundle.crt",
             )
-            # Test connection
+
             self.client.ping()
             logger.info(f"Redis connected: {host}:{port}")
+
         except Exception as e:
             logger.error(f"Redis connection failed: {e}")
             raise
@@ -38,3 +43,4 @@ class RedisMemory:
         except Exception as e:
             logger.error(f"Failed to save state for {session_id}: {e}")
             raise
+        

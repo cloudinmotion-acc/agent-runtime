@@ -4,3 +4,7 @@ curl -X POST http://localhost:8000/agent/run \
     "user_id": "bharath",
     "input": "Explain EKS in one paragraph"
   }'
+
+---------------------
+# install redis client to talk to redis
+sudo yum install -y redis 
