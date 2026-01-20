@@ -2,7 +2,7 @@ import os
 import logging
 from fastapi import APIRouter, HTTPException # pyright: ignore[reportMissingImports]
 from pydantic import BaseModel, Field
-from app.agents.simple_agent import SimpleChatAgent
+from app.agents.factory import get_agent
 from app.router.client import ModelRouterClient
 from app.memory.redis import RedisMemory
 
@@ -19,15 +19,16 @@ MODEL_ROUTER_URL = os.getenv("MODEL_ROUTER_URL", "http://localhost:8000")
 REDIS_HOST = os.getenv("REDIS_HOST")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
+FRAMEWORK = os.getenv("FRAMEWORK", "langgraph")
 
 try:
-    agent = SimpleChatAgent(
+    agent = get_agent(
         router=ModelRouterClient(MODEL_ROUTER_URL),
-        memory=RedisMemory(REDIS_HOST, REDIS_PORT, REDIS_PASSWORD)
+        memory=RedisMemory(REDIS_HOST, REDIS_PORT, REDIS_PASSWORD) # type: ignore
     )
-    logger.info("Agent initialized successfully")
+    logger.info(f"Agent initialized successfully with framework: {FRAMEWORK}")
 except Exception as e:
-    logger.error(f"Failed to initialize agent: {e}")
+    logger.error(f"Failed to initialize agent with framework {FRAMEWORK}: {e}")
     # Don't fail startup - let endpoint handle the error
     agent = None
 

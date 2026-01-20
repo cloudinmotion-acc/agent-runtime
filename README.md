@@ -1,7 +1,5 @@
 # Agent Runtime
 
-## -------------------- TBD -------------------- 
-
 ## Getting-Started
 
 ### Step-1
@@ -26,7 +24,7 @@ pip install -r requirements.txt
 
 ### Step-3
 
-Create a `.env` file and copy the contents from `.env.example` and replace with your keys
+Export variable with your keys. Check `.env.example`.
 
 ### Setp-4
 
@@ -45,18 +43,7 @@ curl -X POST http://localhost:9000/agent/run \
   -H "Content-Type: application/json" \
   -d '{
     "session_id": "demo-1",
-    "input": "Who are you?",
-    "model": "gpt-5-nano"
-  }'
-```
-
-Then:
-```sh
-curl -X POST http://localhost:9000/agent/run \
-  -H "Content-Type: application/json" \
-  -d '{
-    "session_id": "demo-1",
-    "input": "What did I just ask?",
+    "input": "Lemme test you, remember what im aksing?",
     "model": "gpt-5-nano"
   }'
 ```
