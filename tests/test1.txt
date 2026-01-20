@@ -1,3 +1,21 @@
+{
+  "session_id": "demo-1",
+  "input": "Hi mate my name is Bharath",
+  "model": "gpt-5-nano"
+}
+
+{
+  "session_id": "demo-1",
+  "input": "Lemme test you do you remember my name i said?",
+  "model": "gpt-5-nano"
+}
+-----------------------
+# See if a session exists and its TTL
+curl http://localhost:9000/debug/session/demo-1
+
+# Delete a session to start fresh
+curl -X DELETE http://localhost:9000/debug/session/demo-1
+----------------------
 curl -X POST http://localhost:8000/agent/run \
   -H "Content-Type: application/json" \
   -d '{
@@ -8,3 +26,12 @@ curl -X POST http://localhost:8000/agent/run \
 ---------------------
 # install redis client to talk to redis
 sudo yum install -y redis 
+
+# connect to elastic redis:
+redis-cli \
+  -h clustercfg.fastapi19-redis-dev.gcvryk.use1.cache.amazonaws.com \
+  -p 6379 \
+  -a 'OE7HnnmJp6yntuXW' \
+  --tls \
+  --cacert /etc/pki/tls/certs/ca-bundle.crt \
+  -c
