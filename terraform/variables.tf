@@ -103,8 +103,8 @@ variable "resource_requests" {
     memory = string
   })
   default = {
-    cpu    = "100m"
-    memory = "256Mi"
+    cpu    = "200m"
+    memory = "512Mi"
   }
 }
 
@@ -115,7 +115,7 @@ variable "resource_limits" {
     memory = string
   })
   default = {
-    cpu    = "500m"
-    memory = "512Mi"
+    cpu    = "1000m"
+    memory = "1Gi"
   }
 }
