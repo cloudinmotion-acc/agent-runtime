@@ -1,37 +1,26 @@
-# Create namespace for agent-runtime
-resource "kubernetes_namespace_v1" "namespace" {
+resource "kubernetes_secret_v1" "fastapi_envs" {
   metadata {
-    name = var.namespace
-  }
-}
-
-# Create secret for agent-runtime environment variables
-resource "kubernetes_secret_v1" "agent_runtime_envs" {
-  metadata {
-    name      = "agent-runtime-secrets"
-    namespace = kubernetes_namespace_v1.namespace.metadata[0].name
+    name      = "fastapi-secrets"
+    namespace = var.model_router_output.namespace
   }
 
   type = "Opaque"
 
   data = {
-    MODEL_ROUTER_URL = var.model_router_url
+    MODEL_ROUTER_URL = var.model_router_output.server_service_dns != "" ? "http://${var.model_router_output.server_service_dns}:${tostring(var.model_router_output.server_service_port)}" : "http://model-router-server-service.model-router.svc.cluster.local:8000"
     REDIS_HOST       = var.redis_host
     REDIS_PORT       = tostring(var.redis_port)
     REDIS_PASSWORD   = var.redis_password
     FRAMEWORK        = var.framework
   }
-
-  depends_on = [kubernetes_namespace_v1.namespace]
 }
 
-# Create deployment for agent-runtime application
-resource "kubernetes_deployment_v1" "agent_runtime_app" {
+resource "kubernetes_deployment_v1" "fastapi_app" {
   metadata {
-    name      = "agent-runtime-app"
-    namespace = kubernetes_namespace_v1.namespace.metadata[0].name
+    name      = "fastapi-app"
+    namespace = var.model_router_output.namespace
     labels = {
-      app = "agent-runtime"
+      app = "fastapi"
     }
   }
 
@@ -40,20 +29,20 @@ resource "kubernetes_deployment_v1" "agent_runtime_app" {
 
     selector {
       match_labels = {
-        app = "agent-runtime"
+        app = "fastapi"
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "agent-runtime"
+          app = "fastapi"
         }
       }
 
       spec {
         container {
-          name  = "agent-runtime"
+          name  = "fastapi"
           image = var.image
           
           port {
@@ -64,62 +53,42 @@ resource "kubernetes_deployment_v1" "agent_runtime_app" {
           # Load all environment variables from secret
           env_from {
             secret_ref {
-              name = kubernetes_secret_v1.agent_runtime_envs.metadata[0].name
+              name = kubernetes_secret_v1.fastapi_envs.metadata[0].name
             }
           }
           
           # Resource requests and limits
           resources {
             requests = {
-              cpu    = "100m"
-              memory = "256Mi"
+              cpu    = var.resource_requests.cpu
+              memory = var.resource_requests.memory
             }
             limits = {
-              cpu    = "500m"
-              memory = "512Mi"
+              cpu    = var.resource_limits.cpu
+              memory = var.resource_limits.memory
             }
-          }
-          
-          # Liveness probe
-          liveness_probe {
-            http_get {
-              path = "/health"
-              port = var.pod_port
-            }
-            initial_delay_seconds = 30
-            period_seconds        = 10
-          }
-          
-          # Readiness probe
-          readiness_probe {
-            http_get {
-              path = "/ready"
-              port = var.pod_port
-            }
-            initial_delay_seconds = 5
-            period_seconds        = 5
           }
         }
       }
     }
   }
 
-  depends_on = [kubernetes_secret_v1.agent_runtime_envs]
+  depends_on = [kubernetes_secret_v1.fastapi_envs]
 }
 
-# Create service for agent-runtime
-resource "kubernetes_service_v1" "agent_runtime_service" {
+# Create service for fastapi
+resource "kubernetes_service_v1" "fastapi_service" {
   metadata {
-    name      = "agent-runtime-service"
-    namespace = kubernetes_namespace_v1.namespace.metadata[0].name
+    name      = "fastapi-service"
+    namespace = var.model_router_output.namespace
     labels = {
-      app = "agent-runtime"
+      app = "fastapi"
     }
   }
 
   spec {
     selector = {
-      app = "agent-runtime"
+      app = "fastapi"
     }
 
     port {
@@ -129,8 +98,8 @@ resource "kubernetes_service_v1" "agent_runtime_service" {
       name        = "http"
     }
 
-    type = "ClusterIP"
+    type = var.service_type
   }
 
-  depends_on = [kubernetes_deployment_v1.agent_runtime_app]
+  depends_on = [kubernetes_deployment_v1.fastapi_app]
 }
