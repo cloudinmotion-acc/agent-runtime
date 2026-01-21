@@ -31,7 +31,7 @@ Export variable with your keys. Check `.env.example`.
 Run the FastAPI application
 
 ```bash
-uvicorn app.main:app --reload --port 9000
+uvicorn app.main:app --reload --port 9000 --host 0.0.0.0
 ```
 
 ### Step-5
