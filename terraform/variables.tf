@@ -1,15 +1,16 @@
 variable "model_router_output" {
   description = "model_router_output for fastapi deployment"
   type = object({
-    namespace              = string
-    server_service_dns     = string
-    server_service_port    = number
+    namespace           = string
+    server_service_dns  = string
+    server_service_port = number
   })
 }
 
 variable "image" {
   description = "Docker image URI from ECR for the fastapi application"
   type        = string
+  default     = "310378384655.dkr.ecr.us-east-1.amazonaws.com/fastapi:v1"
   nullable    = false
 }
 

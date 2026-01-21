@@ -44,19 +44,19 @@ resource "kubernetes_deployment_v1" "fastapi_app" {
         container {
           name  = "fastapi"
           image = var.image
-          
+
           port {
             container_port = var.pod_port
             name           = "http"
           }
-          
+
           # Load all environment variables from secret
           env_from {
             secret_ref {
               name = kubernetes_secret_v1.fastapi_envs.metadata[0].name
             }
           }
-          
+
           # Resource requests and limits
           resources {
             requests = {
